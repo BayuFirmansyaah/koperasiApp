@@ -58,6 +58,17 @@ class Pinjaman extends Model
         return $this->belongsTo(User::class, 'approved_by_bendahara');
     }
 
+    // Aliases for convenience
+    public function reviewedBy()
+    {
+        return $this->approvedByPengurus();
+    }
+
+    public function approvedBy()
+    {
+        return $this->approvedByBendahara();
+    }
+
     public function angsurans()
     {
         return $this->hasMany(Angsuran::class);

@@ -9,9 +9,11 @@ use App\Models\Simpanan;
 use App\Models\Pinjaman;
 use App\Models\Angsuran;
 use App\Models\Kas;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class DashboardController extends Controller
 {
+    use AuthorizesRequests;
     public function index()
     {
         $user = auth()->user();

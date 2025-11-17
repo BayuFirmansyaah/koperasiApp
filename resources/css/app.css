@@ -302,3 +302,35 @@
     transform: translateY(-1px);
 }
 
+/* ==========================================================================
+   SIDEBAR LOGOUT BUTTON
+   ========================================================================== */
+
+.sidebar-item:has(form[action*="logout"]) {
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 0.75rem;
+}
+
+.sidebar-item:has(form[action*="logout"]) .sidebar-link {
+    color: #fff;
+    background: rgba(220, 53, 69, 0.1);
+    border-left-color: #dc3545;
+}
+
+.sidebar-item:has(form[action*="logout"]) .sidebar-link:hover {
+    background: rgba(220, 53, 69, 0.2);
+    border-left-color: #dc3545;
+}
+
+.sidebar-item:has(form[action*="logout"]) .sidebar-link:active {
+    background: rgba(220, 53, 69, 0.3);
+}
+
+.sidebar-item:has(form[action*="logout"]) button {
+    border: none;
+    background: none;
+    padding: 0;
+    width: 100%;
+}
+

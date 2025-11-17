@@ -129,3 +129,8 @@
     </x-slot:icon>
     Pengaturan
 </x-sidebar-item>
+
+{{-- Logout --}}
+<hr class="my-3">
+<x-sidebar-logout />
+
