@@ -4,10 +4,6 @@
 @import 'bootstrap/dist/css/bootstrap.css';
 @import 'bootstrap-icons/font/bootstrap-icons.css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* Custom Styles & CSS Variables */
 :root {
     --primary-color: #0054a6;
