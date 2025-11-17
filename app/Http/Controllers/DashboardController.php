@@ -208,18 +208,26 @@ class DashboardController extends Controller
         $totalUsers = User::count();
         $totalAnggota = Anggota::where('status', 'active')->count();
         $anggotaPending = Anggota::where('status', 'pending')->count();
+        $anggotaAktif = Anggota::where('status', 'active')->count();
+        $anggotaMenunggu = Anggota::where('status', 'pending')->count();
+        $anggotaDitolak = Anggota::where('status', 'rejected')->count();
+        $anggotaNonaktif = Anggota::where('status', 'inactive')->count();
         
         // Financial Stats
         $totalSimpanan = Simpanan::where('status', 'verified')->sum('nominal');
         $simpananBulanIni = Simpanan::where('status', 'verified')
-            ->where('tanggal', '>=', now()->startOfMonth())
+            ->where('tanggal_transaksi', '>=', now()->startOfMonth())
             ->sum('nominal');
         $transaksiSimpananBulanIni = Simpanan::where('status', 'verified')
-            ->where('tanggal', '>=', now()->startOfMonth())
+            ->where('tanggal_transaksi', '>=', now()->startOfMonth())
             ->count();
             
-        $totalPinjaman = Pinjaman::whereIn('status', ['berjalan', 'dicairkan'])->sum('total_pinjaman');
-        $sisaPinjaman = Pinjaman::whereIn('status', ['berjalan', 'dicairkan'])->sum('sisa_pinjaman');
+        $totalPinjaman = Pinjaman::whereIn('status', ['berjalan', 'approved_bendahara'])->count();
+        $pinjamanMenunggu = Pinjaman::where('status', 'pending')->count();
+        $pinjamanDiluluskan = Pinjaman::where('status', 'approved_bendahara')->count();
+        $pinjamanBerjalan = Pinjaman::where('status', 'berjalan')->count();
+        $pinjamanDitolak = Pinjaman::where('status', 'rejected')->count();
+        $sisaPinjaman = Pinjaman::whereIn('status', ['berjalan', 'approved_bendahara'])->sum('sisa_pinjaman');
         $pinjamanLunas = Pinjaman::where('status', 'lunas')->count();
         
         $saldoKas = Kas::latest()->first()->saldo_sesudah ?? 0;
@@ -249,7 +257,7 @@ class DashboardController extends Controller
         
         // Monthly growth
         $anggotaBulanLalu = Anggota::where('status', 'active')
-            ->where('tanggal_bergabung', '<', now()->startOfMonth())
+            ->where('created_at', '<', now()->startOfMonth())
             ->count();
         $pertumbuhanAnggota = $anggotaBulanLalu > 0 
             ? round((($totalAnggota - $anggotaBulanLalu) / $anggotaBulanLalu) * 100, 1)
@@ -259,10 +267,18 @@ class DashboardController extends Controller
             'totalUsers' => $totalUsers,
             'totalAnggota' => $totalAnggota,
             'anggotaPending' => $anggotaPending,
+            'anggotaAktif' => $anggotaAktif,
+            'anggotaMenunggu' => $anggotaMenunggu,
+            'anggotaDitolak' => $anggotaDitolak,
+            'anggotaNonaktif' => $anggotaNonaktif,
             'totalSimpanan' => $totalSimpanan,
             'simpananBulanIni' => $simpananBulanIni,
             'transaksiSimpananBulanIni' => $transaksiSimpananBulanIni,
             'totalPinjaman' => $totalPinjaman,
+            'pinjamanMenunggu' => $pinjamanMenunggu,
+            'pinjamanDiluluskan' => $pinjamanDiluluskan,
+            'pinjamanBerjalan' => $pinjamanBerjalan,
+            'pinjamanDitolak' => $pinjamanDitolak,
             'sisaPinjaman' => $sisaPinjaman,
             'pinjamanLunas' => $pinjamanLunas,
             'saldoKas' => $saldoKas,
@@ -274,7 +290,7 @@ class DashboardController extends Controller
             'pertumbuhanAnggota' => $pertumbuhanAnggota,
         ];
 
-        return view('dashboard.admin', $data);
+        return view('dashboard', $data);
     }
 }
 
