@@ -116,19 +116,8 @@
 {{-- Settings & Admin --}}
 <x-sidebar-section title="Administrasi" />
 
-<x-sidebar-item route="dashboard" can="manage-users">
-    <x-slot:icon>
-        <x-icon name="user-cog" />
-    </x-slot:icon>
-    Manajemen User
-</x-sidebar-item>
-
-<x-sidebar-item route="dashboard" can="manage-settings">
-    <x-slot:icon>
-        <x-icon name="settings" />
-    </x-slot:icon>
-    Pengaturan
-</x-sidebar-item>
+{{-- TODO: User Management will be added in future --}}
+{{-- TODO: Settings will be added in future --}}
 
 {{-- Logout --}}
 <hr class="my-3">
