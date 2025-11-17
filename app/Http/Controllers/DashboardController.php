@@ -204,155 +204,101 @@ class DashboardController extends Controller
 
     private function adminDashboard()
     {
-        // User & Anggota Stats
-        $totalUsers = User::count();
-        $totalAnggota = Anggota::where('status', 'active')->count();
-        $anggotaPending = Anggota::where('status', 'pending')->count();
-        $anggotaAktif = Anggota::where('status', 'active')->count();
-        $anggotaMenunggu = Anggota::where('status', 'pending')->count();
-        $anggotaDitolak = Anggota::where('status', 'rejected')->count();
-        $anggotaNonaktif = Anggota::where('status', 'inactive')->count();
+        $totalAnggota = Anggota::count();
+        $totalSimpanan = Simpanan::sum('nominal');
+        $saldoKas = Kas::sum('nominal');
         
-        // Financial Stats
-        $totalSimpanan = Simpanan::where('status', 'verified')->sum('nominal');
-        $simpananBulanIni = Simpanan::where('status', 'verified')
-            ->where('tanggal_transaksi', '>=', now()->startOfMonth())
-            ->sum('nominal');
-        $transaksiSimpananBulanIni = Simpanan::where('status', 'verified')
-            ->where('tanggal_transaksi', '>=', now()->startOfMonth())
-            ->count();
-        $simpananMinggulalu = Simpanan::where('status', 'verified')
-            ->whereBetween('tanggal_transaksi', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()])
-            ->sum('nominal');
-            
-        $totalPinjaman = Pinjaman::whereIn('status', ['berjalan', 'approved_bendahara'])->count();
-        $pinjamanMenunggu = Pinjaman::where('status', 'pending')->count();
-        $pinjamanDiluluskan = Pinjaman::where('status', 'approved_bendahara')->count();
-        $pinjamanBerjalan = Pinjaman::where('status', 'berjalan')->count();
-        $pinjamanDitolak = Pinjaman::where('status', 'rejected')->count();
-        $sisaPinjaman = Pinjaman::whereIn('status', ['berjalan', 'approved_bendahara'])->sum('sisa_pinjaman');
-        $pinjamanLunas = Pinjaman::where('status', 'lunas')->count();
-        $totalNominalPinjaman = Pinjaman::whereIn('status', ['berjalan', 'approved_bendahara'])->sum('total_pinjaman');
-        
-        $saldoKas = Kas::latest()->first()->saldo_sesudah ?? 0;
-        $pemasukanBulanIni = Kas::where('jenis', 'masuk')
-            ->where('tanggal_transaksi', '>=', now()->startOfMonth())
-            ->sum('nominal');
-        $pengeluaranBulanIni = Kas::where('jenis', 'keluar')
-            ->where('tanggal_transaksi', '>=', now()->startOfMonth())
-            ->sum('nominal');
-        
-        // Insights & Alerts
-        $angsuranTerlambat = Angsuran::where('status', 'belum_bayar')
-            ->whereDate('tanggal_jatuh_tempo', '<', now()->toDateString())
-            ->count();
-        $simpananPending = Simpanan::where('status', 'pending')->count();
-        $pinjamanPending = Pinjaman::where('status', 'pending')->count();
-        
-        // Portfolio Quality
-        $totalAngsuran = Angsuran::where('status', 'verified')->count();
-        $angsuranTerbayar = Angsuran::where('status', 'verified')->count();
-        $tingkatPembayaran = $totalAngsuran > 0 ? round(($angsuranTerbayar / $totalAngsuran) * 100, 1) : 0;
-        
-        // Monthly comparison
-        $anggotaBulanLalu = Anggota::where('status', 'active')
-            ->where('created_at', '<', now()->startOfMonth())
-            ->count();
+        // Growth calculations
+        $anggotaBulanIni = Anggota::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)->count();
+        $anggotaBulanLalu = Anggota::whereMonth('created_at', now()->subMonth()->month)
+            ->whereYear('created_at', now()->subMonth()->year)->count();
         $pertumbuhanAnggota = $anggotaBulanLalu > 0 
-            ? round((($totalAnggota - $anggotaBulanLalu) / $anggotaBulanLalu) * 100, 1)
+            ? round((($anggotaBulanIni - $anggotaBulanLalu) / $anggotaBulanLalu) * 100, 1)
             : 0;
+
+        $simpananBulanIni = Simpanan::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)->sum('nominal');
+        $pertumbuhanSimpanan = 0;
+
+        // Status counts
+        $anggotaAktif = Anggota::where('status', 'aktif')->count();
+        $anggotaMenunggu = Anggota::where('status', 'menunggu')->count();
+        $anggotaDitolak = Anggota::where('status', 'ditolak')->count();
+        $anggotaNonaktif = Anggota::where('status', 'non-aktif')->count();
+
+        $pinjamanMenunggu = Pinjaman::where('status', 'menunggu')->count();
+        $pinjamanBerjalan = Pinjaman::where('status', 'aktif')->count();
+        $pinjamanLunas = Pinjaman::where('status', 'lunas')->count();
         
-        $simpananBulanLalu = Simpanan::where('status', 'verified')
-            ->whereBetween('tanggal_transaksi', [now()->subMonth()->startOfMonth(), now()->subMonth()->endOfMonth()])
+        // Calculate overdue loans
+        $pinjamanBermasalah = Angsuran::where('status', 'terlambat')
+            ->distinct('pinjaman_id')->count('pinjaman_id');
+
+        // Financial data
+        $pemasukanBulanIni = Kas::where('jenis', 'masuk')
+            ->whereMonth('tanggal_transaksi', now()->month)
+            ->whereYear('tanggal_transaksi', now()->year)
             ->sum('nominal');
-        $pertumbuhanSimpanan = $simpananBulanLalu > 0
-            ? round((($simpananBulanIni - $simpananBulanLalu) / $simpananBulanLalu) * 100, 1)
-            : 0;
         
-        // Risk Analysis
-        $pinjamanBermasalah = Pinjaman::where('status', 'berjalan')
-            ->whereHas('angsurans', function($q) {
-                $q->where('status', 'belum_bayar')
-                  ->whereDate('tanggal_jatuh_tempo', '<', now());
-            })
-            ->count();
-        
-        // Recent Activity
-        $anggotaTerbaru = Anggota::with('user')
-            ->where('status', 'active')
-            ->latest()
-            ->limit(5)
-            ->get();
-            
-        $pinjamanTerbaru = Pinjaman::with('anggota')
-            ->latest()
-            ->limit(5)
-            ->get();
-            
-        $transaksiTerbaru = Kas::with('transactable')
-            ->latest()
-            ->limit(10)
-            ->get();
-        
-        // Top performers & Problems
-        $topPeminjam = Pinjaman::selectRaw('anggota_id, COUNT(*) as total_pinjaman, SUM(total_pinjaman) as nominal_total')
+        $pengeluaranBulanIni = Kas::where('jenis', 'keluar')
+            ->whereMonth('tanggal_transaksi', now()->month)
+            ->whereYear('tanggal_transaksi', now()->year)
+            ->sum('nominal');
+
+        // Payment rate
+        $totalAngsuran = Angsuran::count();
+        $angsuranTerbayar = Angsuran::where('status', 'lunas')->count();
+        $tingkatPembayaran = $totalAngsuran > 0 ? round(($angsuranTerbayar / $totalAngsuran) * 100, 1) : 0;
+
+        // Pending counts for alerts
+        $angsuranTerlambat = Angsuran::where('status', 'terlambat')->count();
+        $simpananPending = Simpanan::where('status', 'menunggu')->count();
+        $pinjamanPending = Pinjaman::where('status', 'menunggu')->count();
+
+        // Top borrowers
+        $topPeminjam = Pinjaman::selectRaw('anggota_id, SUM(nominal_pinjaman) as nominal_total')
+            ->where('status', '!=', 'ditolak')
             ->groupBy('anggota_id')
             ->orderByDesc('nominal_total')
-            ->limit(5)
-            ->with('anggota')
-            ->get();
-        
-        $anggotaTerbanyakAngsuran = Angsuran::selectRaw('pinjaman_id')
-            ->where('status', 'belum_bayar')
-            ->whereDate('tanggal_jatuh_tempo', '<', now())
-            ->groupBy('pinjaman_id')
-            ->with('pinjaman.anggota')
+            ->with('anggota.user')
             ->limit(5)
             ->get();
 
-        $data = [
-            'totalUsers' => $totalUsers,
+        // Recent transactions
+        $transaksiTerbaru = Kas::orderByDesc('tanggal_transaksi')->limit(10)->get();
+        $transaksiSimpananBulanIni = Simpanan::whereMonth('created_at', now()->month)->count();
+
+        // Calculations for remaining data
+        $sisaPinjaman = Pinjaman::where('status', '!=', 'lunas')->sum('sisa_pinjaman');
+
+        return view('dashboard', [
             'totalAnggota' => $totalAnggota,
-            'anggotaPending' => $anggotaPending,
+            'totalSimpanan' => $totalSimpanan,
+            'saldoKas' => $saldoKas,
+            'pertumbuhanAnggota' => $pertumbuhanAnggota,
+            'pertumbuhanSimpanan' => $pertumbuhanSimpanan,
+            'simpananBulanIni' => $simpananBulanIni,
             'anggotaAktif' => $anggotaAktif,
             'anggotaMenunggu' => $anggotaMenunggu,
             'anggotaDitolak' => $anggotaDitolak,
             'anggotaNonaktif' => $anggotaNonaktif,
-            'pertumbuhanAnggota' => $pertumbuhanAnggota,
-            
-            'totalSimpanan' => $totalSimpanan,
-            'simpananBulanIni' => $simpananBulanIni,
-            'simpananMinggulalu' => $simpananMinggulalu,
-            'transaksiSimpananBulanIni' => $transaksiSimpananBulanIni,
-            'pertumbuhanSimpanan' => $pertumbuhanSimpanan,
-            
-            'totalPinjaman' => $totalPinjaman,
-            'totalNominalPinjaman' => $totalNominalPinjaman,
             'pinjamanMenunggu' => $pinjamanMenunggu,
-            'pinjamanDiluluskan' => $pinjamanDiluluskan,
             'pinjamanBerjalan' => $pinjamanBerjalan,
-            'pinjamanDitolak' => $pinjamanDitolak,
-            'pinjamanBermasalah' => $pinjamanBermasalah,
-            'sisaPinjaman' => $sisaPinjaman,
             'pinjamanLunas' => $pinjamanLunas,
-            
-            'saldoKas' => $saldoKas,
+            'pinjamanBermasalah' => $pinjamanBermasalah,
             'pemasukanBulanIni' => $pemasukanBulanIni,
             'pengeluaranBulanIni' => $pengeluaranBulanIni,
-            
+            'tingkatPembayaran' => $tingkatPembayaran,
             'angsuranTerlambat' => $angsuranTerlambat,
             'simpananPending' => $simpananPending,
             'pinjamanPending' => $pinjamanPending,
-            'tingkatPembayaran' => $tingkatPembayaran,
-            
-            'anggotaTerbaru' => $anggotaTerbaru,
-            'pinjamanTerbaru' => $pinjamanTerbaru,
-            'transaksiTerbaru' => $transaksiTerbaru,
             'topPeminjam' => $topPeminjam,
-            'anggotaTerbanyakAngsuran' => $anggotaTerbanyakAngsuran,
-        ];
-
-        return view('dashboard', $data);
+            'transaksiTerbaru' => $transaksiTerbaru,
+            'transaksiSimpananBulanIni' => $transaksiSimpananBulanIni,
+            'sisaPinjaman' => $sisaPinjaman,
+            'totalNominalPinjaman' => Pinjaman::where('status', 'aktif')->sum('nominal_pinjaman'),
+        ]);
     }
 }
 

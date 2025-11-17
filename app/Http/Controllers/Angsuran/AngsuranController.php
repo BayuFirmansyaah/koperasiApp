@@ -8,9 +8,12 @@ use App\Models\Pinjaman;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AngsuranController extends Controller implements HasMiddleware
 {
+    use AuthorizesRequests;
+
     public static function middleware(): array
     {
         return [

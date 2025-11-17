@@ -1,34 +1,32 @@
 <x-app-layout>
-    <div class="page-header d-print-none">
-        <div class="container-xl">
-            <div class="row g-2 align-items-center">
-                <div class="col">
-                    <h2 class="page-title">
-                        Review Pinjaman
-                    </h2>
-                    <div class="text-muted mt-1">Review pengajuan pinjaman dari anggota</div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <x-slot name="header">
+        <h2>Review Pinjaman</h2>
+    </x-slot>
 
-    <div class="page-body">
-        <div class="container-xl">
+    <div class="py-4">
+        <div class="container-lg">
             @if(session('success'))
             <div class="alert alert-success alert-dismissible" role="alert">
-                <div class="d-flex">
-                    <div>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
-                    </div>
-                    <div>{{ session('success') }}</div>
-                </div>
+                {{ session('success') }}
                 <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
             </div>
             @endif
 
-            <div class="row row-cards">
-                @forelse($pinjamans as $pinjaman)
-                <div class="col-md-6 col-lg-4">
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>No. Pinjaman</th>
+                                <th>Anggota</th>
+                                <th>Tanggal</th>
+                                <th class="text-end">Nominal</th>
+                                <th>Tenor</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($pinjamans as $pinjaman)
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">{{ $pinjaman->no_pinjaman }}</h3>

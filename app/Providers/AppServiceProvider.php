@@ -4,6 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
+use App\Models\Angsuran;
+use App\Policies\AngsuranPolicy;
 use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,6 +24,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register policies
+        Gate::policy(Angsuran::class, AngsuranPolicy::class);
+
         // Register custom Blade directive for safe date formatting
         Blade::directive('dateFormat', function ($expression) {
             return "<?php echo app('date.formatter')->format($expression); ?>";

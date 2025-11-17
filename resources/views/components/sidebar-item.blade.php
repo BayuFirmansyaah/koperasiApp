@@ -3,9 +3,11 @@
     'icon',
     'label' => null,
     'badge' => null,
-    'badgeColor' => 'primary'
+    'badgeColor' => 'primary',
+    'can' => null
 ])
 
+@if(!$can || auth()->user()?->can($can))
 <li class="sidebar-item {{ request()->routeIs($route) ? 'active' : '' }}">
     <a href="{{ route($route) }}" class="sidebar-link">
         <span class="sidebar-icon">
@@ -17,3 +19,4 @@
         @endif
     </a>
 </li>
+@endif

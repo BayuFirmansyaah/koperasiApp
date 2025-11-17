@@ -2,7 +2,8 @@
     'label',
     'icon',
     'routes' => [],
-    'id'
+    'id',
+    'can' => null
 ])
 
 @php
@@ -15,6 +16,7 @@
     }
 @endphp
 
+@if(!$can || auth()->user()?->can($can))
 <li class="sidebar-item has-submenu {{ $isActive ? 'active open' : '' }}">
     <a href="#{{ $id }}" class="sidebar-link" data-bs-toggle="collapse" aria-expanded="{{ $isActive ? 'true' : 'false' }}">
         <span class="sidebar-icon">
@@ -31,3 +33,4 @@
         {{ $slot }}
     </ul>
 </li>
+@endif

@@ -11,7 +11,7 @@
 <!-- Welcome Section -->
 <div class="row mb-3">
     <div class="col-12">
-        <div class="card bg-purple text-white">
+        <div class="card bg-primary text-white">
             <div class="card-body">
                 <div class="row align-items-center">
                     <div class="col">
@@ -122,106 +122,10 @@
         </div>
     </div>
 
-    <!-- Anggota Pending List -->
-    <div class="col-lg-6">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Daftar Anggota Menunggu Persetujuan</h3>
-                <div class="card-actions">
-                    <a href="{{ route('pengurus.approval.index') }}" class="btn btn-sm btn-primary">Lihat Semua</a>
-                </div>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-vcenter card-table">
-                    <thead>
-                        <tr>
-                            <th>Nama</th>
-                            <th>Email</th>
-                            <th>Tanggal Daftar</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($anggotaPendingList as $anggota)
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <span class="avatar avatar-sm me-2" style="background-image: url(https://ui-avatars.com/api/?name={{ urlencode($anggota->user->name) }}&size=32&background=206bc4&color=fff)"></span>
-                                    {{ $anggota->user->name }}
-                                </div>
-                            </td>
-                            <td class="text-muted">{{ $anggota->user->email }}</td>
-                            <td class="text-muted">{{ formatDate($anggota->created_at) }}</td>
-                            <td class="text-end">
-                                <a href="{{ route('pengurus.approval.show', $anggota->id) }}" class="btn btn-sm btn-primary">Review</a>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="4" class="text-center text-muted py-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg mb-2" width="48" height="48" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
-                                <div>Tidak ada anggota pending</div>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pinjaman Pending List -->
-    <div class="col-lg-6">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Pengajuan Pinjaman Menunggu Review</h3>
-                <div class="card-actions">
-                    <a href="{{ route('pinjaman.index') }}" class="btn btn-sm btn-primary">Lihat Semua</a>
-                </div>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-vcenter card-table">
-                    <thead>
-                        <tr>
-                            <th>Anggota</th>
-                            <th>Nominal</th>
-                            <th>Tanggal</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($pinjamanPendingList as $pinjaman)
-                        <tr>
-                            <td>
-                                <div>{{ $pinjaman->anggota->user->name }}</div>
-                                <div class="text-muted small">{{ $pinjaman->anggota->no_anggota }}</div>
-                            </td>
-                            <td>
-                                <div class="fw-bold">Rp {{ number_format($pinjaman->total_pinjaman, 0, ',', '.') }}</div>
-                                <div class="text-muted small">{{ $pinjaman->jangka_waktu }} bulan</div>
-                            </td>
-                            <td class="text-muted">{{ formatDate($pinjaman->tanggal_pengajuan) }}</td>
-                            <td class="text-end">
-                                <a href="{{ route('pinjaman.show', $pinjaman->id) }}" class="btn btn-sm btn-yellow">Review</a>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="4" class="text-center text-muted py-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg mb-2" width="48" height="48" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
-                                <div>Tidak ada pinjaman pending</div>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
 
     <!-- Quick Actions -->
-    <div class="col-lg-8">
-        <div class="card">
+    <div class="col-lg-12 my-3">
+        <div class="card" style="width:100%">
             <div class="card-header">
                 <h3 class="card-title">Aksi Cepat</h3>
             </div>
@@ -289,9 +193,106 @@
         </div>
     </div>
 
-    <!-- Info & Tips -->
-    <div class="col-lg-4">
+    <!-- Anggota Pending List -->
+    <div class="col-lg-6 my-3">
         <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Daftar Anggota Menunggu Persetujuan</h3>
+                <div class="card-actions">
+                    <a href="{{ route('pengurus.approval.index') }}" class="btn btn-sm btn-primary">Lihat Semua</a>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th>Tanggal Daftar</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($anggotaPendingList as $anggota)
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <span class="avatar avatar-sm me-2" style="background-image: url(https://ui-avatars.com/api/?name={{ urlencode($anggota->user->name) }}&size=32&background=206bc4&color=fff)"></span>
+                                    {{ $anggota->user->name }}
+                                </div>
+                            </td>
+                            <td class="text-muted">{{ $anggota->user->email }}</td>
+                            <td class="text-muted">{{ formatDate($anggota->created_at) }}</td>
+                            <td class="text-end">
+                                <a href="{{ route('anggota.show', $anggota->id) }}" class="btn btn-sm btn-primary">Review</a>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg mb-2" width="48" height="48" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                                <div>Tidak ada anggota pending</div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pinjaman Pending List -->
+    <div class="col-lg-6 my-3">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Pengajuan Pinjaman Menunggu Review</h3>
+                <div class="card-actions">
+                    <a href="{{ route('pinjaman.index') }}" class="btn btn-sm btn-primary">Lihat Semua</a>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-vcenter card-table">
+                    <thead>
+                        <tr>
+                            <th>Anggota</th>
+                            <th>Nominal</th>
+                            <th>Tanggal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($pinjamanPendingList as $pinjaman)
+                        <tr>
+                            <td>
+                                <div>{{ $pinjaman->anggota->user->name }}</div>
+                                <div class="text-muted small">{{ $pinjaman->anggota->no_anggota }}</div>
+                            </td>
+                            <td>
+                                <div class="fw-bold">Rp {{ number_format($pinjaman->total_pinjaman, 0, ',', '.') }}</div>
+                                <div class="text-muted small">{{ $pinjaman->jangka_waktu }} bulan</div>
+                            </td>
+                            <td class="text-muted">{{ formatDate($pinjaman->tanggal_pengajuan) }}</td>
+                            <td class="text-end">
+                                <a href="{{ route('pinjaman.show', $pinjaman->id) }}" class="btn btn-sm btn-yellow">Review</a>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg mb-2" width="48" height="48" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                                <div>Tidak ada pinjaman pending</div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+     <!-- Info & Tips -->
+    <div class="col-lg-6 my-3">
+        <div class="card" style="width: 100%">
             <div class="card-header">
                 <h3 class="card-title">Tugas & Tanggung Jawab</h3>
             </div>
@@ -315,9 +316,11 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Statistics Summary -->
-        <div class="card mt-3">
+    <div class="col-lg-6 my-3">
+         <!-- Statistics Summary -->
+        <div class="card" style="width:100%">
             <div class="card-header">
                 <h3 class="card-title">Ringkasan Bulan Ini</h3>
             </div>
