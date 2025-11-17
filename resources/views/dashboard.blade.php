@@ -1,14 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl leading-tight" style="color: #1e293b;">
+        <h2 class="fw-semibold fs-5" style="color: #1e293b;">
             {{ __('Dashboard') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6" style="color: #1e293b;">
+    <div class="py-5">
+        <div class="container-xl">
+            <div class="card">
+                <div class="card-body" style="color: #1e293b;">
                     {{ __("You're logged in!") }}
                 </div>
             </div>
