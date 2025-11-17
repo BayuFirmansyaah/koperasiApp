@@ -14,7 +14,7 @@
         <div class="container-xl">
             <!-- Stats Cards Row -->
             <div class="row mb-4">
-                @can('view anggota')
+                @can('view-anggota')
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="card border-0 shadow-sm">
                         <div class="card-body">
@@ -33,7 +33,7 @@
                 </div>
                 @endcan
 
-                @can('view pinjaman')
+                @can('view-pinjaman')
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="card border-0 shadow-sm">
                         <div class="card-body">
@@ -52,7 +52,7 @@
                 </div>
                 @endcan
 
-                @can('view simpanan')
+                @can('view-simpanan')
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="card border-0 shadow-sm">
                         <div class="card-body">
@@ -71,7 +71,7 @@
                 </div>
                 @endcan
 
-                @can('view kas')
+                @can('view-kas')
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="card border-0 shadow-sm">
                         <div class="card-body">
@@ -93,7 +93,7 @@
 
             <!-- Status Overview Row -->
             <div class="row mb-4">
-                @can('view anggota')
+                @can('view-anggota')
                 <div class="col-md-6 mb-3">
                     <div class="card border-0 shadow-sm">
                         <div class="card-header bg-white border-bottom">
@@ -133,7 +133,7 @@
                 </div>
                 @endcan
 
-                @can('view pinjaman')
+                @can('view-pinjaman')
                 <div class="col-md-6 mb-3">
                     <div class="card border-0 shadow-sm">
                         <div class="card-header bg-white border-bottom">
@@ -176,7 +176,6 @@
 
             <!-- Recent Activities / Quick Actions -->
             <div class="row">
-                @can('create anggota')
                 <div class="col-md-12 mb-3">
                     <div class="card border-0 shadow-sm">
                         <div class="card-header bg-white border-bottom">
@@ -186,7 +185,7 @@
                         </div>
                         <div class="card-body">
                             <div class="row g-2">
-                                @can('create anggota')
+                                @can('create-anggota')
                                 <div class="col-md-3 col-sm-6">
                                     <a href="{{ route('anggota.create') }}" class="btn btn-outline-primary w-100">
                                         <i class="bi bi-person-plus"></i> Tambah Anggota
@@ -194,7 +193,7 @@
                                 </div>
                                 @endcan
 
-                                @can('create pinjaman')
+                                @can('create-pinjaman')
                                 <div class="col-md-3 col-sm-6">
                                     <a href="{{ route('pinjaman.create') }}" class="btn btn-outline-success w-100">
                                         <i class="bi bi-cash-coin"></i> Ajukan Pinjaman
@@ -202,7 +201,7 @@
                                 </div>
                                 @endcan
 
-                                @can('create simpanan')
+                                @can('create-simpanan')
                                 <div class="col-md-3 col-sm-6">
                                     <a href="{{ route('simpanan.create') }}" class="btn btn-outline-info w-100">
                                         <i class="bi bi-piggy-bank"></i> Tambah Simpanan
@@ -210,7 +209,7 @@
                                 </div>
                                 @endcan
 
-                                @can('view angsuran')
+                                @can('view-angsuran')
                                 <div class="col-md-3 col-sm-6">
                                     <a href="{{ route('angsuran.index') }}" class="btn btn-outline-warning w-100">
                                         <i class="bi bi-calendar-check"></i> Daftar Angsuran
@@ -221,7 +220,6 @@
                         </div>
                     </div>
                 </div>
-                @endcan
             </div>
 
             <!-- Welcome Message -->
