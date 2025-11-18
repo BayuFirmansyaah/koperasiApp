@@ -1,20 +1,5 @@
 #############################################
-# STAGE 1: Build Frontend Assets (Node 20 LTS)
-#############################################
-FROM node:20-alpine AS build-stage
-WORKDIR /app
-
-# Install npm dependencies
-COPY package*.json ./
-RUN npm install --no-optional
-
-# Copy all files and build assets
-COPY . .
-RUN npm run build
-
-
-#############################################
-# STAGE 2: PHP 8.3 Runtime (Laravel)
+# STAGE 1: PHP 8.3 Runtime (Laravel)
 #############################################
 FROM php:8.3-fpm-alpine
 
@@ -73,6 +58,21 @@ RUN composer install --no-dev --no-interaction --optimize-autoloader
 
 # Copy built assets from Node stage
 COPY --from=build-stage /app/public/build /app/public/build
+
+#############################################
+# STAGE 2: Build Frontend Assets (Node 20 LTS)
+#############################################
+FROM node:20-alpine AS build-stage
+WORKDIR /app
+
+# Install npm dependencies
+COPY package*.json ./
+RUN npm install --no-optional
+
+# Copy all files and build assets
+COPY . .
+RUN npm run build
+
 
 # Create Laravel storage folders
 RUN mkdir -p storage/logs storage/framework/{cache,sessions,views}
