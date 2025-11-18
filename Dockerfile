@@ -1,5 +1,22 @@
 #############################################
-# STAGE 1: PHP 8.3 Runtime (Laravel)
+# STAGE 1: Build Frontend Assets (Node 20 LTS)
+#############################################
+FROM node:20-alpine AS build-stage
+WORKDIR /app
+
+# Install npm dependencies
+COPY package*.json ./
+RUN npm install --no-optional
+
+# Copy all project files
+COPY . .
+
+# Build assets
+RUN npm run build
+
+
+#############################################
+# STAGE 2: PHP 8.3 Runtime (Laravel)
 #############################################
 FROM php:8.3-fpm-alpine
 
@@ -37,66 +54,48 @@ RUN docker-php-ext-install -j$(nproc) \
 RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd
 
-# Install remaining PHP extensions
+# Remaining PHP extensions
 RUN docker-php-ext-install -j$(nproc) \
     mbstring ctype curl fileinfo intl xml
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
+# Working directory
 WORKDIR /app
 
-# Copy application source code
+# Copy PHP app code
 COPY . .
 
-# Remove old vendor
+# Clear old vendor
 RUN rm -rf vendor || true
 
-# Install PHP dependencies
+# Install PHP deps
 RUN composer install --no-dev --no-interaction --optimize-autoloader
 
-# Copy built assets from Node stage
+# Copy built assets from Node build-stage
 COPY --from=build-stage /app/public/build /app/public/build
 
-#############################################
-# STAGE 2: Build Frontend Assets (Node 20 LTS)
-#############################################
-FROM node:20-alpine AS build-stage
-WORKDIR /app
-
-# Install npm dependencies
-COPY package*.json ./
-RUN npm install --no-optional
-
-# Copy all files and build assets
-COPY . .
-RUN npm run build
-
-
-# Create Laravel storage folders
+# Laravel storage dirs
 RUN mkdir -p storage/logs storage/framework/{cache,sessions,views}
 
-# Set permissions
+# Fix permissions
 RUN chown -R www-data:www-data /app \
     && chmod -R 755 storage bootstrap/cache
 
 # Copy PHP config
 COPY docker/php.ini /usr/local/etc/php/conf.d/laravel.ini
 
-# Copy entrypoint
+# Entrypoint
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Expose PHP-FPM port
+# Expose PHP-FPM
 EXPOSE 9001
 
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD php-fpm-healthcheck || exit 1
 
-# Entrypoint
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-
-# Start PHP-FPM
 CMD ["php-fpm"]
