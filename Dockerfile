@@ -13,24 +13,33 @@ RUN apk add --no-cache \
     postgresql-dev \
     sqlite \
     mysql-client \
-    oniguruma-dev
+    oniguruma-dev \
+    icu-dev \
+    autoconf \
+    g++ \
+    make
 
-# Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) \
-    gd \
+# Install PHP core extensions
+RUN docker-php-ext-install -j$(nproc) \
     pdo \
     pdo_mysql \
     pdo_pgsql \
     pdo_sqlite \
-    mbstring \
     opcache \
-    bcmath \
+    bcmath
+
+# Install GD extension with proper configuration
+RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd
+
+# Install remaining extensions
+RUN docker-php-ext-install -j$(nproc) \
+    mbstring \
     ctype \
-    json \
-    xml \
     curl \
-    fileinfo
+    fileinfo \
+    intl \
+    xml
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -41,6 +50,9 @@ WORKDIR /app
 # Copy application code
 COPY . .
 
+# Remove node_modules and vendor from copy (will be rebuilt)
+RUN rm -rf vendor node_modules public/build || true
+
 # Install PHP dependencies
 RUN composer install --no-dev --no-interaction --optimize-autoloader
 
@@ -48,7 +60,7 @@ RUN composer install --no-dev --no-interaction --optimize-autoloader
 RUN apk add --no-cache nodejs npm
 
 # Install npm dependencies and build
-RUN npm install && npm run build
+RUN npm install --no-optional && npm run build
 
 # Set permissions
 RUN chown -R www-data:www-data /app && \
@@ -65,7 +77,7 @@ COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Expose port
-EXPOSE 9091
+EXPOSE 9000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
