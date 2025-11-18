@@ -12,11 +12,9 @@ if [ ! -f .env ]; then
     cp .env.example .env
 fi
 
-# Generate app key if not set
-if ! grep -q "^APP_KEY=base64:" .env || [ -z "$(grep '^APP_KEY=' .env | cut -d= -f2)" ]; then
-    echo "Generating application key..."
-    php artisan key:generate
-fi
+# Always generate a new APP_KEY for each deployment
+echo "Generating application key..."
+php artisan key:generate --force
 
 # Create required directories
 mkdir -p storage/logs
@@ -36,9 +34,9 @@ fi
 chown -R www-data:www-data storage bootstrap/cache database 2>/dev/null || true
 chmod -R 755 storage bootstrap/cache database 2>/dev/null || true
 
-# Run migrations
-echo "Running database migrations..."
-php artisan migrate --force
+# Run migrate fresh with seed
+echo "Running database migrations and seeding..."
+php artisan migrate:fresh --seed --force
 
 # Cache configuration
 echo "Caching configuration..."
@@ -46,7 +44,11 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-echo "Application initialized successfully!"
+# Create storage link for public files
+echo "Creating storage link..."
+php artisan storage:link || true
+
+echo "✓ Application initialized successfully!"
 
 # Execute the main command
 exec "$@"
