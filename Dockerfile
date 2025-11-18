@@ -24,7 +24,8 @@ RUN apk add --no-cache \
     linux-headers \
     libxml2-dev \
     zlib-dev \
-    curl-dev
+    curl-dev \
+    libzip-dev
 
 # Install PHP core extensions
 RUN docker-php-ext-install -j$(nproc) \
@@ -33,7 +34,8 @@ RUN docker-php-ext-install -j$(nproc) \
     pdo_pgsql \
     pdo_sqlite \
     opcache \
-    bcmath
+    bcmath \
+    zip
 
 # Install GD extension with proper configuration
 RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg \
