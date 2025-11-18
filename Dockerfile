@@ -21,7 +21,10 @@ RUN apk add --no-cache \
     g++ \
     make \
     pkgconfig \
-    linux-headers
+    linux-headers \
+    libxml2-dev \
+    zlib-dev \
+    curl-dev
 
 # Install PHP core extensions
 RUN docker-php-ext-install -j$(nproc) \
