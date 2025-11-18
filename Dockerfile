@@ -1,6 +1,6 @@
 FROM php:8.3-fpm-alpine
 
-# Install system dependencies
+# Install system dependencies and build tools
 RUN apk add --no-cache \
     curl \
     wget \
@@ -12,12 +12,16 @@ RUN apk add --no-cache \
     freetype-dev \
     postgresql-dev \
     sqlite \
+    sqlite-dev \
+    sqlite-libs \
     mysql-client \
     oniguruma-dev \
     icu-dev \
     autoconf \
     g++ \
-    make
+    make \
+    pkgconfig \
+    linux-headers
 
 # Install PHP core extensions
 RUN docker-php-ext-install -j$(nproc) \
